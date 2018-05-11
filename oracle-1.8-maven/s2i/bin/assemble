@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Restore artifacts from the previous build (if they exist).
+echo "---> Restoring build artifacts..."
+if [ "$(ls -A /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring found build artifacts..."
+  ls -alh /tmp/artifacts
+  cp -Rf /tmp/artifacts/. ./
+fi
+
+echo 'Install application code'
+
+cp -R /tmp/src/. ./
+
+echo "prepare configure file"
+if [[ -f "settings.xml" ]]; then
+    echo "copying settings.xml file from code base"
+    mkdir -p .m2 
+    cp settings.xml .m2/settings.xml
+fi
+ls -alh 
+mvn clean package
+
+cp target/*.war .
+
+# cleanup
+mvn clean
+rm -rf .m2/settings.xml
